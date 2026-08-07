@@ -27,6 +27,12 @@ import {
   HoverCardContent,
   HoverCardTrigger,
 } from "@/components/ui/preview-card";
+import {
+  taskTypeColors,
+  taskTypeIcons,
+  taskTypeLabels,
+  toTaskType,
+} from "@/constants/task-types";
 import { useDeleteTask } from "@/hooks/mutations/task/use-delete-task";
 import useActiveWorkspace from "@/hooks/queries/workspace/use-active-workspace";
 import { useGetActiveWorkspaceUsers } from "@/hooks/queries/workspace-users/use-get-active-workspace-users";
@@ -38,12 +44,6 @@ import {
 } from "@/lib/due-date-status";
 import { getInitials } from "@/lib/get-initials";
 import { getPriorityIcon } from "@/lib/priority";
-import {
-  taskTypeColors,
-  taskTypeIcons,
-  taskTypeLabels,
-  toTaskType,
-} from "@/constants/task-types";
 import { toast } from "@/lib/toast";
 import queryClient from "@/query-client";
 import useBulkSelectionStore from "@/store/bulk-selection";

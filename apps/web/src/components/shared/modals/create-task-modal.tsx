@@ -37,6 +37,14 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
+import {
+  DEFAULT_TASK_TYPE,
+  TASK_TYPES,
+  type TaskType,
+  taskTypeColors,
+  taskTypeIcons,
+  taskTypeLabels,
+} from "@/constants/task-types";
 import useCreateLabel from "@/hooks/mutations/label/use-create-label";
 import useCreateTask from "@/hooks/mutations/task/use-create-task";
 import { useDeleteTask } from "@/hooks/mutations/task/use-delete-task";
@@ -50,14 +58,6 @@ import { cn } from "@/lib/cn";
 import { formatDateMedium } from "@/lib/format";
 import { getInitials } from "@/lib/get-initials";
 import { getPriorityIcon } from "@/lib/priority";
-import {
-  DEFAULT_TASK_TYPE,
-  TASK_TYPES,
-  type TaskType,
-  taskTypeColors,
-  taskTypeIcons,
-  taskTypeLabels,
-} from "@/constants/task-types";
 import { toast } from "@/lib/toast";
 import useProjectStore from "@/store/project";
 import type Task from "@/types/task";
@@ -794,7 +794,9 @@ function CreateTaskModal({
                     {(() => {
                       const Icon = taskTypeIcons[taskType];
                       return (
-                        <Icon className={cn("h-4 w-4", taskTypeColors[taskType])} />
+                        <Icon
+                          className={cn("h-4 w-4", taskTypeColors[taskType])}
+                        />
                       );
                     })()}
                     <span>{taskTypeLabels[taskType]}</span>

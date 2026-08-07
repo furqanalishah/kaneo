@@ -68,9 +68,7 @@ export default function TaskTypePopover({
               >
                 <Icon className={cn("h-4 w-4", taskTypeColors[value])} />
                 <span className="text-sm">{taskTypeLabels[value]}</span>
-                {currentType === value && (
-                  <Check className="ml-auto h-4 w-4" />
-                )}
+                {currentType === value && <Check className="ml-auto h-4 w-4" />}
               </button>
             );
           })}

@@ -4,9 +4,9 @@ import db from "../../database";
 import { columnTable, taskTable, userTable } from "../../database/schema";
 import { publishEvent } from "../../events";
 import {
-  DEFAULT_TASK_TYPE,
   assertValidTaskStatus,
   assertValidTaskType,
+  DEFAULT_TASK_TYPE,
 } from "../validate-task-fields";
 import { claimTaskNumber } from "./claim-task-numbers";
 

@@ -2,18 +2,12 @@ import {
   Bookmark,
   Bug,
   CheckSquare,
-  type LucideIcon,
   Layers,
   ListTree,
+  type LucideIcon,
 } from "lucide-react";
 
-export const TASK_TYPES = [
-  "epic",
-  "story",
-  "task",
-  "sub-task",
-  "bug",
-] as const;
+export const TASK_TYPES = ["epic", "story", "task", "sub-task", "bug"] as const;
 
 export type TaskType = (typeof TASK_TYPES)[number];
 
@@ -45,7 +39,8 @@ export const taskTypeColors: Record<TaskType, string> = {
 
 export function isTaskType(value: unknown): value is TaskType {
   return (
-    typeof value === "string" && (TASK_TYPES as readonly string[]).includes(value)
+    typeof value === "string" &&
+    (TASK_TYPES as readonly string[]).includes(value)
   );
 }
 
