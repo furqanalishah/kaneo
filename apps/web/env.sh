@@ -61,8 +61,15 @@ done
 # KANEO_TURNSTILE_SITE_KEY was left unset (issue #1304). Apply to any future
 # runtime-substituted flag so the same trap doesn't recur.
 echo "Stripping unset KANEO_* placeholders..."
+# The bundler decides how to quote an inlined `import.meta.env` value, and it is
+# not always a double-quoted string: current builds emit template literals
+# (backticks). Strip every quoting style, otherwise the placeholder survives as a
+# truthy string and the frontend treats an unconfigured flag as configured.
 find /usr/share/nginx/html -type f \( -name "*.js" -o -name "*.css" \) \
-  -exec grep -lE '"KANEO_[A-Z_]+"' {} \; \
-  | xargs -r sed -i -E 's#"KANEO_[A-Z_]+"#""#g'
+  -exec grep -lE '("|'"'"'|`)KANEO_[A-Z_]+("|'"'"'|`)' {} \; \
+  | xargs -r sed -i \
+      -e 's#"KANEO_[A-Z_]*"#""#g' \
+      -e "s#'KANEO_[A-Z_]*'#''#g" \
+      -e 's#`KANEO_[A-Z_]*`#``#g'
 
 echo "✅ Environment variable replacement complete"
