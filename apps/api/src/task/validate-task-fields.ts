@@ -11,12 +11,30 @@ export const VALID_PRIORITIES = [
   "urgent",
 ] as const;
 
+export const VALID_TASK_TYPES = [
+  "epic",
+  "story",
+  "task",
+  "sub-task",
+  "bug",
+] as const;
+
+export const DEFAULT_TASK_TYPE = "task";
+
 export const VIRTUAL_STATUSES = ["planned", "archived"] as const;
 
 export function assertValidPriority(priority: string): void {
   if (!(VALID_PRIORITIES as readonly string[]).includes(priority)) {
     throw new HTTPException(400, {
       message: `Invalid priority "${priority}". Valid values: ${VALID_PRIORITIES.join(", ")}`,
+    });
+  }
+}
+
+export function assertValidTaskType(type: string): void {
+  if (!(VALID_TASK_TYPES as readonly string[]).includes(type)) {
+    throw new HTTPException(400, {
+      message: `Invalid type "${type}". Valid values: ${VALID_TASK_TYPES.join(", ")}`,
     });
   }
 }
@@ -69,5 +87,18 @@ export function coercePriority(priority: string): {
   return {
     priority: "no-priority",
     warning: `Unknown priority "${priority}" mapped to "no-priority"`,
+  };
+}
+
+export function coerceTaskType(type: string): {
+  type: string;
+  warning?: string;
+} {
+  if ((VALID_TASK_TYPES as readonly string[]).includes(type)) {
+    return { type };
+  }
+  return {
+    type: DEFAULT_TASK_TYPE,
+    warning: `Unknown type "${type}" mapped to "${DEFAULT_TASK_TYPE}"`,
   };
 }

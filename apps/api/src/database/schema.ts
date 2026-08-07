@@ -381,6 +381,7 @@ export const taskTable = pgTable(
       onUpdate: "cascade",
     }),
     priority: text("priority").default("low"),
+    type: text("type").notNull().default("task"),
     startDate: timestamp("start_date", { mode: "date" }),
     dueDate: timestamp("due_date", { mode: "date" }),
     createdAt: timestamp("created_at", { mode: "date" }).defaultNow().notNull(),
@@ -394,6 +395,7 @@ export const taskTable = pgTable(
     index("task_dueDate_idx").on(table.dueDate),
     index("task_assigneeId_idx").on(table.userId),
     index("task_columnId_idx").on(table.columnId),
+    index("task_type_idx").on(table.type),
     unique("task_project_number_unique").on(table.projectId, table.number),
   ],
 );

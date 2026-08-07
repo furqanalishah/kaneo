@@ -38,12 +38,19 @@ import { formatDateShort } from "@/lib/format";
 import { getInitials } from "@/lib/get-initials";
 import { getPriorityLabel, getStatusDisplayLabel } from "@/lib/i18n/domain";
 import { getPriorityIcon } from "@/lib/priority";
+import {
+  taskTypeColors,
+  taskTypeIcons,
+  taskTypeLabels,
+  toTaskType,
+} from "@/constants/task-types";
 import { toast } from "@/lib/toast";
 import TaskAssigneePopover from "./task-assignee-popover";
 import TaskDueDatePopover from "./task-due-date-popover";
 import TaskLabelsPopover from "./task-labels-popover";
 import TaskMovePopover from "./task-move-popover";
 import TaskPriorityPopover from "./task-priority-popover";
+import TaskTypePopover from "./task-type-popover";
 import TaskStartDatePopover from "./task-start-date-popover";
 import TaskStatusPopover from "./task-status-popover";
 
@@ -213,6 +220,25 @@ export default function TaskPropertiesSidebar({
                   </Button>
                 </TaskStatusPopover>
               )}
+              {task &&
+                (() => {
+                  const type = toTaskType(task.type);
+                  const Icon = taskTypeIcons[type];
+                  return (
+                    <TaskTypePopover task={task}>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="justify-start h-7 px-1.5 gap-1.5"
+                      >
+                        <Icon className={`h-4 w-4 ${taskTypeColors[type]}`} />
+                        <span className="text-xs font-semibold truncate">
+                          {taskTypeLabels[type]}
+                        </span>
+                      </Button>
+                    </TaskTypePopover>
+                  );
+                })()}
               {task && (
                 <TaskPriorityPopover task={task}>
                   <Button

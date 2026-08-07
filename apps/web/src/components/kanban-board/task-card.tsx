@@ -36,6 +36,12 @@ import {
 } from "@/lib/due-date-status";
 import { getInitials } from "@/lib/get-initials";
 import { getPriorityIcon } from "@/lib/priority";
+import {
+  taskTypeColors,
+  taskTypeIcons,
+  taskTypeLabels,
+  toTaskType,
+} from "@/constants/task-types";
 import { toast } from "@/lib/toast";
 import queryClient from "@/query-client";
 import useBulkSelectionStore from "@/store/bulk-selection";
@@ -257,6 +263,20 @@ function TaskCard({ task, disableDragDrop = false }: TaskCardProps) {
             )}
 
             <div className="flex items-center gap-1.5">
+              {(() => {
+                const type = toTaskType(task.type);
+                const Icon = taskTypeIcons[type];
+                return (
+                  <span
+                    className="inline-flex items-center gap-1 rounded border border-border/70 bg-muted/55 px-2 py-1 text-[10px] font-medium text-muted-foreground"
+                    title={taskTypeLabels[type]}
+                  >
+                    <Icon className={`w-3 h-3 ${taskTypeColors[type]}`} />
+                    {taskTypeLabels[type]}
+                  </span>
+                );
+              })()}
+
               {showPriority && (
                 <span className="inline-flex items-center gap-1 rounded border border-border/70 bg-muted/55 px-2 py-1 text-[10px] font-medium text-muted-foreground">
                   {getPriorityIcon(task.priority ?? "")}

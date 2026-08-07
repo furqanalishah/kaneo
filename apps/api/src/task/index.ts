@@ -45,7 +45,7 @@ import updateTaskDueDate from "./controllers/update-task-due-date";
 import updateTaskPriority from "./controllers/update-task-priority";
 import updateTaskStatus from "./controllers/update-task-status";
 import updateTaskTitle from "./controllers/update-task-title";
-import { VALID_PRIORITIES } from "./validate-task-fields";
+import { VALID_PRIORITIES, VALID_TASK_TYPES } from "./validate-task-fields";
 
 const task = new Hono<{
   Variables: {
@@ -195,6 +195,7 @@ const task = new Hono<{
         startDate: v.optional(v.string()),
         dueDate: v.optional(v.string()),
         priority: v.picklist(VALID_PRIORITIES),
+        type: v.optional(v.picklist(VALID_TASK_TYPES)),
         status: v.string(),
         userId: v.optional(v.string()),
       }),
@@ -210,6 +211,7 @@ const task = new Hono<{
         startDate,
         dueDate,
         priority,
+        type,
         status,
         userId,
       } = c.req.valid("json");
@@ -234,6 +236,7 @@ const task = new Hono<{
         startDate: parsedStartDate,
         dueDate: parsedDueDate,
         priority,
+        type,
         status,
       });
 
@@ -338,6 +341,7 @@ const task = new Hono<{
         startDate: v.optional(v.string()),
         dueDate: v.optional(v.string()),
         priority: v.picklist(VALID_PRIORITIES),
+        type: v.optional(v.picklist(VALID_TASK_TYPES)),
         status: v.string(),
         projectId: v.string(),
         position: v.number(),
@@ -356,6 +360,7 @@ const task = new Hono<{
         startDate,
         dueDate,
         priority,
+        type,
         status,
         projectId,
         position,
@@ -387,6 +392,7 @@ const task = new Hono<{
         position,
         userId,
         currentUserId,
+        type,
       );
 
       return c.json(task);

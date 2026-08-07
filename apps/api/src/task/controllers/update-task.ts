@@ -4,7 +4,10 @@ import db from "../../database";
 import { columnTable, taskTable } from "../../database/schema";
 import { publishEvent } from "../../events";
 import { deleteOrphanedAssets } from "../../storage/cleanup-assets";
-import { assertValidTaskStatus } from "../validate-task-fields";
+import {
+  assertValidTaskStatus,
+  assertValidTaskType,
+} from "../validate-task-fields";
 
 async function updateTask(
   id: string,
@@ -18,6 +21,7 @@ async function updateTask(
   position: number,
   userId?: string,
   currentUserId?: string,
+  type?: string,
 ) {
   const [existingTask] = await db
     .select({
@@ -44,6 +48,10 @@ async function updateTask(
 
   await assertValidTaskStatus(status, projectId);
 
+  if (type !== undefined) {
+    assertValidTaskType(type);
+  }
+
   const column = await db.query.columnTable.findFirst({
     where: and(
       eq(columnTable.projectId, projectId),
@@ -62,6 +70,7 @@ async function updateTask(
       projectId,
       description,
       priority,
+      ...(type !== undefined ? { type } : {}),
       position,
       userId: userId || null,
     })

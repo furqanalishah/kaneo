@@ -13,6 +13,8 @@ const prioritySchema = z.enum([
   "urgent",
 ]);
 
+const taskTypeSchema = z.enum(["epic", "story", "task", "sub-task", "bug"]);
+
 const nonEmptyString = z.string().trim().min(1);
 const optionalNonEmptyString = nonEmptyString.optional();
 const nullableOptionalNonEmptyString = nonEmptyString.nullable().optional();
@@ -244,6 +246,7 @@ export function registerTools(
         title: nonEmptyString,
         description: z.string(),
         priority: prioritySchema,
+        type: taskTypeSchema.optional(),
         status: nonEmptyString,
         startDate: optionalIsoDateTimeSchema,
         dueDate: optionalIsoDateTimeSchema,
@@ -257,6 +260,9 @@ export function registerTools(
         priority: args.priority,
         status: args.status,
       };
+      if (args.type !== undefined) {
+        body.type = args.type;
+      }
       if (args.startDate !== undefined) {
         body.startDate = args.startDate;
       }
@@ -281,6 +287,7 @@ export function registerTools(
     description: z.string().nullable().optional(),
     status: optionalNonEmptyString,
     priority: prioritySchema.optional(),
+    type: taskTypeSchema.optional(),
     projectId: optionalNonEmptyString,
     position: z.number().optional(),
     startDate: nullableOptionalIsoDateTimeSchema,

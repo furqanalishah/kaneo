@@ -68,6 +68,12 @@ function isTaskPriority(v: string): v is (typeof PRIORITIES)[number] {
   return (PRIORITIES as readonly string[]).includes(v);
 }
 
+const TASK_TYPES = ["epic", "story", "task", "sub-task", "bug"] as const;
+
+function isTaskType(v: string): v is (typeof TASK_TYPES)[number] {
+  return (TASK_TYPES as readonly string[]).includes(v);
+}
+
 function formatOptionalIso(value: unknown): string | undefined {
   if (value === null || value === undefined) return undefined;
   if (value instanceof Date) return value.toISOString();
@@ -116,6 +122,12 @@ function buildFullTaskUpdateBody(
   if (!priorityRaw || !isTaskPriority(priorityRaw))
     throw new Error("Cannot update task: invalid or missing priority.");
 
+  const typeRaw =
+    (patch.type as string) ??
+    (typeof existing.type === "string" ? existing.type : undefined);
+  if (typeRaw !== undefined && !isTaskType(typeRaw))
+    throw new Error("Cannot update task: invalid type.");
+
   const projectId =
     (patch.projectId as string) ??
     (typeof existing.projectId === "string" ? existing.projectId : undefined);
@@ -148,6 +160,7 @@ function buildFullTaskUpdateBody(
   if (startDate !== undefined) body.startDate = startDate;
   if (dueDate !== undefined) body.dueDate = dueDate;
   if (userId !== undefined) body.userId = userId;
+  if (typeRaw !== undefined) body.type = typeRaw;
   return body;
 }
 
@@ -158,6 +171,7 @@ const prioritySchema = z.enum([
   "high",
   "urgent",
 ]);
+const taskTypeSchema = z.enum(["epic", "story", "task", "sub-task", "bug"]);
 const nonEmptyString = z.string().trim().min(1);
 const optionalNonEmptyString = nonEmptyString.optional();
 const nullableOptionalNonEmptyString = nonEmptyString.nullable().optional();
@@ -376,6 +390,7 @@ export function registerMcpTools(
         title: nonEmptyString,
         description: z.string(),
         priority: prioritySchema,
+        type: taskTypeSchema.optional(),
         status: nonEmptyString,
         startDate: optionalIsoDateTimeSchema,
         dueDate: optionalIsoDateTimeSchema,
@@ -389,6 +404,7 @@ export function registerMcpTools(
         priority: args.priority,
         status: args.status,
       };
+      if (args.type !== undefined) body.type = args.type;
       if (args.startDate !== undefined) body.startDate = args.startDate;
       if (args.dueDate !== undefined) body.dueDate = args.dueDate;
       if (args.userId !== undefined) body.userId = args.userId;
@@ -412,6 +428,7 @@ export function registerMcpTools(
         description: z.string().nullable().optional(),
         status: optionalNonEmptyString,
         priority: prioritySchema.optional(),
+        type: taskTypeSchema.optional(),
         projectId: optionalNonEmptyString,
         position: z.number().optional(),
         startDate: nullableOptionalIsoDateTimeSchema,

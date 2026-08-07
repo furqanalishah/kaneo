@@ -38,6 +38,12 @@ import {
 } from "@/lib/due-date-status";
 import { getInitials } from "@/lib/get-initials";
 import { getPriorityIcon } from "@/lib/priority";
+import {
+  taskTypeColors,
+  taskTypeIcons,
+  taskTypeLabels,
+  toTaskType,
+} from "@/constants/task-types";
 import { toast } from "@/lib/toast";
 import queryClient from "@/query-client";
 import useBulkSelectionStore from "@/store/bulk-selection";
@@ -202,6 +208,15 @@ function TaskRow({ task, projectSlug }: TaskRowProps) {
             {...attributes}
             {...listeners}
           >
+            {(() => {
+              const type = toTaskType(task.type);
+              const Icon = taskTypeIcons[type];
+              return (
+                <div className="flex-shrink-0" title={taskTypeLabels[type]}>
+                  <Icon className={`h-4 w-4 ${taskTypeColors[type]}`} />
+                </div>
+              );
+            })()}
             {showPriority && (
               <div className="flex-shrink-0 first:[&_svg]:h-4 first:[&_svg]:w-4">
                 {getPriorityIcon(task.priority ?? "")}

@@ -3,7 +3,11 @@ import { HTTPException } from "hono/http-exception";
 import db from "../../database";
 import { columnTable, taskTable, userTable } from "../../database/schema";
 import { publishEvent } from "../../events";
-import { assertValidTaskStatus } from "../validate-task-fields";
+import {
+  DEFAULT_TASK_TYPE,
+  assertValidTaskStatus,
+  assertValidTaskType,
+} from "../validate-task-fields";
 import { claimTaskNumber } from "./claim-task-numbers";
 
 async function createTask({
@@ -16,6 +20,7 @@ async function createTask({
   dueDate,
   description,
   priority,
+  type,
 }: {
   projectId: string;
   currentUserId: string;
@@ -26,11 +31,14 @@ async function createTask({
   dueDate?: Date;
   description?: string;
   priority?: string;
+  type?: string;
 }) {
   const resolvedStatus = status || "to-do";
   const resolvedPriority = priority || "no-priority";
+  const resolvedType = type || DEFAULT_TASK_TYPE;
 
   await assertValidTaskStatus(resolvedStatus, projectId);
+  assertValidTaskType(resolvedType);
 
   const [assignee] = await db
     .select({ name: userTable.name })
@@ -73,6 +81,7 @@ async function createTask({
         dueDate: dueDate || null,
         description: description || "",
         priority: resolvedPriority,
+        type: resolvedType,
         number: taskNumber,
         position: nextPosition,
       })

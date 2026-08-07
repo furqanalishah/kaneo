@@ -50,6 +50,14 @@ import { cn } from "@/lib/cn";
 import { formatDateMedium } from "@/lib/format";
 import { getInitials } from "@/lib/get-initials";
 import { getPriorityIcon } from "@/lib/priority";
+import {
+  DEFAULT_TASK_TYPE,
+  TASK_TYPES,
+  type TaskType,
+  taskTypeColors,
+  taskTypeIcons,
+  taskTypeLabels,
+} from "@/constants/task-types";
 import { toast } from "@/lib/toast";
 import useProjectStore from "@/store/project";
 import type Task from "@/types/task";
@@ -94,6 +102,7 @@ function normalizeTask(
     number: task.number ?? null,
     description: task.description ?? null,
     priority: task.priority ?? null,
+    type: task.type ?? null,
     startDate: task.startDate ?? null,
     dueDate: task.dueDate ?? null,
     position: task.position ?? 0,
@@ -185,6 +194,7 @@ function CreateTaskModal({
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [priority, setPriority] = useState<Priority>("no-priority");
+  const [taskType, setTaskType] = useState<TaskType>(DEFAULT_TASK_TYPE);
   const [assigneeId, setAssigneeId] = useState("");
   const [startDate, setStartDate] = useState<Date | undefined>(undefined);
   const [dueDate, setDueDate] = useState<Date | undefined>(undefined);
@@ -247,6 +257,7 @@ function CreateTaskModal({
     setTitle("");
     setDescription("");
     setPriority("no-priority");
+    setTaskType(DEFAULT_TASK_TYPE);
     setAssigneeId("");
     setStartDate(undefined);
     setDueDate(undefined);
@@ -344,6 +355,7 @@ function CreateTaskModal({
       description: description.trim() || "",
       userId: assigneeId,
       priority,
+      type: taskType,
       projectId: resolvedProjectId,
       startDate: startDate ? startDate.toISOString() : undefined,
       dueDate: dueDate ? dueDate.toISOString() : undefined,
@@ -374,6 +386,7 @@ function CreateTaskModal({
     startDate,
     dueDate,
     priority,
+    taskType,
     resolvedProjectId,
     title,
     t,
@@ -396,6 +409,7 @@ function CreateTaskModal({
               userId: assigneeId || null,
               status: taskStatus,
               priority,
+              type: taskType,
               startDate: startDate ? startDate.toISOString() : null,
               dueDate: dueDate ? dueDate.toISOString() : null,
               projectId: resolvedProjectId,
@@ -407,6 +421,7 @@ function CreateTaskModal({
               description: description.trim() || "",
               userId: assigneeId,
               priority,
+              type: taskType,
               projectId: resolvedProjectId,
               startDate: startDate ? startDate.toISOString() : undefined,
               dueDate: dueDate ? dueDate.toISOString() : undefined,
@@ -439,6 +454,7 @@ function CreateTaskModal({
         setTitle("");
         setDescription("");
         setPriority("no-priority");
+        setTaskType(DEFAULT_TASK_TYPE);
         setAssigneeId("");
         setStartDate(undefined);
         setDueDate(undefined);
@@ -761,6 +777,53 @@ function CreateTaskModal({
                       </Button>
                     </div>
                   )}
+                </PopoverContent>
+              </Popover>
+
+              <Popover>
+                <PopoverTrigger asChild>
+                  <button
+                    type="button"
+                    className={cn(
+                      "flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-medium rounded-md transition-colors border border-border hover:bg-accent/50",
+                      taskType !== DEFAULT_TASK_TYPE
+                        ? "bg-accent/30 text-foreground"
+                        : "text-muted-foreground",
+                    )}
+                  >
+                    {(() => {
+                      const Icon = taskTypeIcons[taskType];
+                      return (
+                        <Icon className={cn("h-4 w-4", taskTypeColors[taskType])} />
+                      );
+                    })()}
+                    <span>{taskTypeLabels[taskType]}</span>
+                  </button>
+                </PopoverTrigger>
+                <PopoverContent className="w-48 p-1" align="start">
+                  <div className="space-y-1">
+                    {TASK_TYPES.map((value) => {
+                      const Icon = taskTypeIcons[value];
+                      return (
+                        <button
+                          key={value}
+                          type="button"
+                          className="w-full flex items-center gap-2 px-2 py-1.5 text-sm hover:bg-accent/50 text-left transition-colors h-8"
+                          onClick={() => setTaskType(value)}
+                        >
+                          <Icon
+                            className={cn("h-4 w-4", taskTypeColors[value])}
+                          />
+                          <span className="text-sm">
+                            {taskTypeLabels[value]}
+                          </span>
+                          {taskType === value && (
+                            <Check className="ml-auto h-4 w-4" />
+                          )}
+                        </button>
+                      );
+                    })}
+                  </div>
                 </PopoverContent>
               </Popover>
 

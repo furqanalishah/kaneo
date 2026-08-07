@@ -6,11 +6,20 @@ export function isTaskPriority(v: string): v is TaskPriority {
   return (PRIORITIES as readonly string[]).includes(v);
 }
 
+const TASK_TYPES = ["epic", "story", "task", "sub-task", "bug"] as const;
+
+export type TaskType = (typeof TASK_TYPES)[number];
+
+export function isTaskType(v: string): v is TaskType {
+  return (TASK_TYPES as readonly string[]).includes(v);
+}
+
 export type TaskUpdatePatch = {
   title?: string;
   description?: string | null;
   status?: string;
   priority?: TaskPriority;
+  type?: TaskType;
   projectId?: string;
   position?: number;
   startDate?: string | null;
@@ -68,6 +77,13 @@ export function buildFullTaskUpdateBody(
     throw new Error("Cannot update task: invalid or missing priority.");
   }
 
+  const typeRaw =
+    patch.type ??
+    (typeof existing.type === "string" ? existing.type : undefined);
+  if (typeRaw !== undefined && !isTaskType(typeRaw)) {
+    throw new Error("Cannot update task: invalid type.");
+  }
+
   const projectId =
     patch.projectId ??
     (typeof existing.projectId === "string" ? existing.projectId : undefined);
@@ -103,6 +119,9 @@ export function buildFullTaskUpdateBody(
     position,
   };
 
+  if (typeRaw !== undefined) {
+    body.type = typeRaw;
+  }
   if (startDate !== undefined) {
     body.startDate = startDate;
   }
