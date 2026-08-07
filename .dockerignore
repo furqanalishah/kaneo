@@ -1,0 +1,54 @@
+# Keep the build context small and reproducible.
+#
+# Without this file a local `pnpm install` leaks host node_modules into the
+# image through `COPY apps/api ./apps/api`, shadowing the dependencies the
+# Dockerfile installed and failing the build.
+
+# Dependencies — always installed inside the image
+node_modules
+**/node_modules
+.pnpm-store
+
+# Build output — produced inside the image
+dist
+**/dist
+build
+**/build
+.turbo
+**/.turbo
+*.tsbuildinfo
+**/*.tsbuildinfo
+.next
+**/.next
+
+# VCS and CI
+.git
+.gitignore
+.github
+.husky
+
+# Local environment and secrets.
+# apps/web/.env.production is intentionally kept: it holds the KANEO_* runtime
+# placeholders that env.sh substitutes at container start.
+.env
+.env.*
+!apps/web/.env.production
+
+# Editor and OS noise
+.idea
+.vscode
+.DS_Store
+**/.DS_Store
+*.swp
+
+# Local compose overrides and docs that never affect a build
+compose.local.yml
+charts
+apps/docs
+apps/site
+
+# Test output
+coverage
+**/coverage
+playwright-report
+**/playwright-report
