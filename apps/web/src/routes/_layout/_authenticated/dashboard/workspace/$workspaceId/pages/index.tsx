@@ -1,4 +1,5 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import WorkspaceLayout from "@/components/common/workspace-layout";
 import PageTree from "@/components/page/page-tree";
 import PageTitle from "@/components/page-title";
 import { Button } from "@/components/ui/button";
@@ -31,26 +32,28 @@ function RouteComponent() {
   return (
     <>
       <PageTitle title="Pages" />
-      <div className="mx-auto max-w-3xl p-6">
-        <div className="mb-4 flex items-center justify-between">
-          <h1 className="text-2xl font-bold">Pages</h1>
-          <Button onClick={() => create()}>New page</Button>
-        </div>
+      <WorkspaceLayout title="Pages">
+        <div className="mx-auto h-full max-w-3xl overflow-y-auto p-6">
+          <div className="mb-4 flex items-center justify-between">
+            <h1 className="text-2xl font-bold">Pages</h1>
+            <Button onClick={() => create()}>New page</Button>
+          </div>
 
-        {isLoading ? (
-          <p className="text-sm text-muted-foreground">Loading…</p>
-        ) : pages.length === 0 ? (
-          <p className="text-sm text-muted-foreground">
-            No pages yet. Create one to start documenting this workspace.
-          </p>
-        ) : (
-          <PageTree
-            pages={pages}
-            workspaceId={workspaceId}
-            onCreateChild={(parentId) => create(parentId)}
-          />
-        )}
-      </div>
+          {isLoading ? (
+            <p className="text-sm text-muted-foreground">Loading…</p>
+          ) : pages.length === 0 ? (
+            <p className="text-sm text-muted-foreground">
+              No pages yet. Create one to start documenting this workspace.
+            </p>
+          ) : (
+            <PageTree
+              pages={pages}
+              workspaceId={workspaceId}
+              onCreateChild={(parentId) => create(parentId)}
+            />
+          )}
+        </div>
+      </WorkspaceLayout>
     </>
   );
 }
