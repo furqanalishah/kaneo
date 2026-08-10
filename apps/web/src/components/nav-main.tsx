@@ -36,6 +36,16 @@ export function NavMain() {
       badge: null,
     },
     {
+      // Not translated yet: this ships ahead of the i18n catalogues, and a raw
+      // key would render as "navigation:sidebar.pages" in every locale.
+      title: "Pages",
+      url: `/dashboard/workspace/${workspace.id}/pages`,
+      isActive: window.location.pathname.startsWith(
+        `/dashboard/workspace/${workspace.id}/pages`,
+      ),
+      badge: null,
+    },
+    {
       title: t("navigation:sidebar.members"),
       url: `/dashboard/workspace/${workspace.id}/members`,
       isActive:
