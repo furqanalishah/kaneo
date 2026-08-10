@@ -18,6 +18,12 @@ build
 **/.turbo
 *.tsbuildinfo
 **/*.tsbuildinfo
+# Incremental tsc state. packages/email points tsBuildInfoFile at
+# .cache/tsbuildinfo.json, which matches neither `dist` nor `*.tsbuildinfo`.
+# Leaking a host build's cache makes tsc think the image is already built, so it
+# emits nothing and the runtime dies on a missing dist/index.js.
+.cache
+**/.cache
 .next
 **/.next
 
