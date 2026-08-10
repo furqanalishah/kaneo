@@ -10,6 +10,7 @@ export type BoardFilters = {
   assignee: string[] | null;
   dueDate: string[] | null;
   labels: string[] | null;
+  type: string[] | null;
 };
 
 export const DUE_DATE_FILTER_VALUES = {
@@ -24,6 +25,7 @@ const DEFAULT_FILTERS: BoardFilters = {
   assignee: null,
   dueDate: null,
   labels: null,
+  type: null,
 };
 
 const FILTER_KEYS: Array<keyof BoardFilters> = [
@@ -32,6 +34,7 @@ const FILTER_KEYS: Array<keyof BoardFilters> = [
   "assignee",
   "dueDate",
   "labels",
+  "type",
 ];
 
 function normalizeFilters(raw: unknown): BoardFilters {
@@ -97,6 +100,16 @@ export function useTaskFilters(
         filters.priority &&
         filters.priority.length > 0 &&
         !filters.priority.includes(task.priority ?? "")
+      ) {
+        return false;
+      }
+
+      // Tasks created before issue types existed have no `type`; treat them as
+      // the default so a type filter never silently hides them.
+      if (
+        filters.type &&
+        filters.type.length > 0 &&
+        !filters.type.includes(task.type ?? "task")
       ) {
         return false;
       }

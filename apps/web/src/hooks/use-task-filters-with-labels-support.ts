@@ -11,6 +11,7 @@ const DEFAULT_FILTERS: BoardFilters = {
   assignee: null,
   dueDate: null,
   labels: null,
+  type: null,
 };
 
 const FILTER_KEYS: Array<keyof BoardFilters> = [
@@ -18,6 +19,7 @@ const FILTER_KEYS: Array<keyof BoardFilters> = [
   "priority",
   "assignee",
   "dueDate",
+  "type",
   "labels",
 ];
 
@@ -109,6 +111,16 @@ export function useTaskFiltersWithLabelsSupport(
           filters.priority &&
           filters.priority.length > 0 &&
           !filters.priority.includes(task.priority ?? "")
+        ) {
+          return false;
+        }
+
+        // Pre-issue-type tasks have no `type`; treat them as the default so a
+        // type filter never silently hides them.
+        if (
+          filters.type &&
+          filters.type.length > 0 &&
+          !filters.type.includes(task.type ?? "task")
         ) {
           return false;
         }

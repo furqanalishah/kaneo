@@ -17,6 +17,12 @@ import {
 } from "@/components/ui/menu";
 import labelColors from "@/constants/label-colors";
 import {
+  TASK_TYPES,
+  taskTypeColors,
+  taskTypeIcons,
+  taskTypeLabels,
+} from "@/constants/task-types";
+import {
   type BoardFilters,
   DUE_DATE_FILTER_VALUES,
 } from "@/hooks/use-task-filters";
@@ -222,6 +228,16 @@ export default function BoardToolbar({
     updateFilter("assignee", next.length > 0 ? next : null);
   };
 
+  const selectedTypeFilters = filters.type ?? [];
+
+  const toggleTypeFilter = (type: string) => {
+    const exists = selectedTypeFilters.includes(type);
+    const next = exists
+      ? selectedTypeFilters.filter((t) => t !== type)
+      : [...selectedTypeFilters, type];
+    updateFilter("type", next.length > 0 ? next : null);
+  };
+
   const toggleDueDateFilter = (dueDate: string) => {
     const exists = selectedDueDateFilters.includes(dueDate);
     const next = exists
@@ -416,6 +432,51 @@ export default function BoardToolbar({
 
                 <DropdownMenuSub>
                   <DropdownMenuSubTrigger className="h-8 rounded-md text-sm">
+                    Type
+                  </DropdownMenuSubTrigger>
+                  <DropdownMenuSubContent className="w-56">
+                    <div className="grid grid-cols-1 gap-1 p-1">
+                      <button
+                        className={`inline-flex h-7 items-center gap-1.5 rounded-md px-2 text-left text-xs ${
+                          selectedTypeFilters.length === 0
+                            ? "bg-accent text-accent-foreground"
+                            : "text-foreground/90 hover:bg-accent/60 hover:text-foreground"
+                        }`}
+                        onClick={() => updateFilter("type", null)}
+                        type="button"
+                      >
+                        <CheckSlot checked={selectedTypeFilters.length === 0} />
+                        All types
+                      </button>
+                      {TASK_TYPES.map((taskType) => {
+                        const Icon = taskTypeIcons[taskType];
+                        return (
+                          <button
+                            key={taskType}
+                            className={`inline-flex h-7 items-center gap-1.5 rounded-md px-2 text-left text-xs ${
+                              selectedTypeFilters.includes(taskType)
+                                ? "bg-accent text-accent-foreground"
+                                : "text-foreground/90 hover:bg-accent/60 hover:text-foreground"
+                            }`}
+                            onClick={() => toggleTypeFilter(taskType)}
+                            type="button"
+                          >
+                            <CheckSlot
+                              checked={selectedTypeFilters.includes(taskType)}
+                            />
+                            <Icon
+                              className={`h-3.5 w-3.5 ${taskTypeColors[taskType]}`}
+                            />
+                            {taskTypeLabels[taskType]}
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </DropdownMenuSubContent>
+                </DropdownMenuSub>
+
+                <DropdownMenuSub>
+                  <DropdownMenuSubTrigger className="h-8 rounded-md text-sm">
                     {t("tasks:boardFilters.subjects.dueDate")}
                   </DropdownMenuSubTrigger>
                   <DropdownMenuSubContent className="w-56">
@@ -578,6 +639,37 @@ export default function BoardToolbar({
                   </span>
                 }
                 onClear={() => updateFilter("priority", null)}
+              />
+            )}
+
+            {selectedTypeFilters.length > 0 && (
+              <ActiveFilterChip
+                subject="Type"
+                operator={t("tasks:boardFilters.operators.isAnyOf")}
+                value={
+                  <span className="inline-flex items-center gap-1.5">
+                    {selectedTypeFilters.map((taskType) => {
+                      const Icon =
+                        taskTypeIcons[taskType as keyof typeof taskTypeIcons];
+                      return Icon ? (
+                        <Icon
+                          key={taskType}
+                          className={`h-3.5 w-3.5 ${taskTypeColors[taskType as keyof typeof taskTypeColors]}`}
+                        />
+                      ) : null;
+                    })}
+                    <span>
+                      {selectedTypeFilters.length === 1
+                        ? taskTypeLabels[
+                            selectedTypeFilters[0] as keyof typeof taskTypeLabels
+                          ]
+                        : t("tasks:boardFilters.selectedCount", {
+                            count: selectedTypeFilters.length,
+                          })}
+                    </span>
+                  </span>
+                }
+                onClear={() => updateFilter("type", null)}
               />
             )}
 
