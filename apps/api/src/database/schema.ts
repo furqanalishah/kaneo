@@ -1094,3 +1094,99 @@ export const organizationRoleRelations = relations(
     }),
   }),
 );
+
+export const pageTable = pgTable(
+  "page",
+  {
+    id: text("id")
+      .$defaultFn(() => createId())
+      .primaryKey(),
+    workspaceId: text("workspace_id")
+      .notNull()
+      .references(() => workspaceTable.id, {
+        onDelete: "cascade",
+        onUpdate: "cascade",
+      }),
+    // Nesting is self-referential. Deleting a parent nulls its children rather
+    // than cascading, so a mis-click cannot silently remove a whole subtree.
+    parentId: text("parent_id"),
+    title: text("title").notNull(),
+    content: text("content").notNull().default(""),
+    icon: text("icon"),
+    position: integer("position").notNull().default(0),
+    createdBy: text("created_by").references(() => userTable.id, {
+      onDelete: "set null",
+      onUpdate: "cascade",
+    }),
+    createdAt: timestamp("created_at", { mode: "date" }).defaultNow().notNull(),
+    updatedAt: timestamp("updated_at", { mode: "date" })
+      .defaultNow()
+      .$onUpdate(() => new Date())
+      .notNull(),
+  },
+  (table) => [
+    foreignKey({
+      columns: [table.parentId],
+      foreignColumns: [table.id],
+    })
+      .onDelete("set null")
+      .onUpdate("cascade"),
+    index("page_workspaceId_idx").on(table.workspaceId),
+    index("page_parentId_idx").on(table.parentId),
+  ],
+);
+
+export const pageTaskLinkTable = pgTable(
+  "page_task_link",
+  {
+    id: text("id")
+      .$defaultFn(() => createId())
+      .primaryKey(),
+    pageId: text("page_id")
+      .notNull()
+      .references(() => pageTable.id, {
+        onDelete: "cascade",
+        onUpdate: "cascade",
+      }),
+    taskId: text("task_id")
+      .notNull()
+      .references(() => taskTable.id, {
+        onDelete: "cascade",
+        onUpdate: "cascade",
+      }),
+    createdAt: timestamp("created_at", { mode: "date" }).defaultNow().notNull(),
+  },
+  (table) => [
+    unique("page_task_link_unique").on(table.pageId, table.taskId),
+    index("page_task_link_pageId_idx").on(table.pageId),
+    index("page_task_link_taskId_idx").on(table.taskId),
+  ],
+);
+
+export const pageTableRelations = relations(pageTable, ({ one, many }) => ({
+  workspace: one(workspaceTable, {
+    fields: [pageTable.workspaceId],
+    references: [workspaceTable.id],
+  }),
+  parent: one(pageTable, {
+    fields: [pageTable.parentId],
+    references: [pageTable.id],
+    relationName: "pageParent",
+  }),
+  children: many(pageTable, { relationName: "pageParent" }),
+  taskLinks: many(pageTaskLinkTable),
+}));
+
+export const pageTaskLinkTableRelations = relations(
+  pageTaskLinkTable,
+  ({ one }) => ({
+    page: one(pageTable, {
+      fields: [pageTaskLinkTable.pageId],
+      references: [pageTable.id],
+    }),
+    task: one(taskTable, {
+      fields: [pageTaskLinkTable.taskId],
+      references: [taskTable.id],
+    }),
+  }),
+);

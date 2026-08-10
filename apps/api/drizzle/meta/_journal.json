@@ -267,6 +267,13 @@
       "when": 1786101173079,
       "tag": "0037_reflective_mojo",
       "breakpoints": true
+    },
+    {
+      "idx": 38,
+      "version": "7",
+      "when": 1786339011379,
+      "tag": "0038_jittery_lightspeed",
+      "breakpoints": true
     }
   ]
 }

@@ -43,6 +43,7 @@ import { migrateColumns } from "./migrations/column-migration";
 import notification from "./notification";
 import notificationPreferences from "./notification-preferences";
 import oauth from "./oauth";
+import page from "./page";
 import { initializePlugins } from "./plugins";
 import { migrateGitHubIntegration } from "./plugins/github/migration";
 import project from "./project";
@@ -560,6 +561,7 @@ export function createApp() {
   const commentApi = api.route("/comment", comment);
   const timeEntryApi = api.route("/time-entry", timeEntry);
   const labelApi = api.route("/label", label);
+  const pageApi = api.route("/page", page);
   const notificationApi = api.route("/notification", notification);
   const notificationPreferencesApi = api.route(
     "/notification-preferences",
@@ -741,6 +743,7 @@ export function createApp() {
     invitationApi,
     invitationPublicApi,
     labelApi,
+    pageApi,
     notificationApi,
     notificationPreferencesApi,
     projectApi,
@@ -858,6 +861,7 @@ const {
   invitationApi,
   invitationPublicApi,
   labelApi,
+  pageApi,
   notificationApi,
   notificationPreferencesApi,
   projectApi,
@@ -893,6 +897,7 @@ export type AppType =
   | typeof commentApi
   | typeof timeEntryApi
   | typeof labelApi
+  | typeof pageApi
   | typeof notificationApi
   | typeof notificationPreferencesApi
   | typeof searchApi
