@@ -574,4 +574,133 @@ export function registerTools(
         });
       }),
   );
+
+  server.registerTool(
+    "list_pages",
+    {
+      description:
+        "List wiki pages in a workspace as a flat array. Nest them by parentId; page bodies are omitted.",
+      inputSchema: z.object({
+        workspaceId: nonEmptyString,
+      }),
+    },
+    async (args) =>
+      run(() =>
+        client.json(
+          `/api/page/workspace/${encodeURIComponent(args.workspaceId)}`,
+          { method: "GET" },
+        ),
+      ),
+  );
+
+  server.registerTool(
+    "get_page",
+    {
+      description:
+        "Get a wiki page with its markdown content and linked tasks.",
+      inputSchema: z.object({
+        pageId: nonEmptyString,
+      }),
+    },
+    async (args) =>
+      run(() =>
+        client.json(`/api/page/${encodeURIComponent(args.pageId)}`, {
+          method: "GET",
+        }),
+      ),
+  );
+
+  server.registerTool(
+    "create_page",
+    {
+      description:
+        "Create a wiki page. Content is markdown. Pass parentId to nest it under an existing page.",
+      inputSchema: z.object({
+        workspaceId: nonEmptyString,
+        title: nonEmptyString,
+        content: z.string().optional(),
+        icon: optionalNonEmptyString,
+        parentId: optionalNonEmptyString,
+      }),
+    },
+    async (args) =>
+      run(() =>
+        client.json("/api/page", {
+          method: "POST",
+          body: JSON.stringify({
+            workspaceId: args.workspaceId,
+            title: args.title,
+            ...(args.content !== undefined ? { content: args.content } : {}),
+            ...(args.icon !== undefined ? { icon: args.icon } : {}),
+            ...(args.parentId !== undefined ? { parentId: args.parentId } : {}),
+          }),
+        }),
+      ),
+  );
+
+  server.registerTool(
+    "update_page",
+    {
+      description:
+        "Update a wiki page. Only the fields supplied are changed, so sending content alone will not clear the title. Rejects a parentId that would put the page beneath its own descendant.",
+      inputSchema: z.object({
+        pageId: nonEmptyString,
+        title: optionalNonEmptyString,
+        content: z.string().optional(),
+        icon: nullableOptionalNonEmptyString,
+        parentId: nullableOptionalNonEmptyString,
+        position: z.number().optional(),
+      }),
+    },
+    async (args) => {
+      const { pageId, ...patch } = args;
+      const body: Record<string, unknown> = {};
+      for (const [key, value] of Object.entries(patch)) {
+        if (value !== undefined) body[key] = value;
+      }
+      return run(() =>
+        client.json(`/api/page/${encodeURIComponent(pageId)}`, {
+          method: "PUT",
+          body: JSON.stringify(body),
+        }),
+      );
+    },
+  );
+
+  server.registerTool(
+    "link_task_to_page",
+    {
+      description:
+        "Link a task to a wiki page. Idempotent; both must be in the same workspace.",
+      inputSchema: z.object({
+        pageId: nonEmptyString,
+        taskId: nonEmptyString,
+      }),
+    },
+    async (args) =>
+      run(() =>
+        client.json(`/api/page/${encodeURIComponent(args.pageId)}/task`, {
+          method: "POST",
+          body: JSON.stringify({ taskId: args.taskId }),
+        }),
+      ),
+  );
+
+  server.registerTool(
+    "unlink_task_from_page",
+    {
+      description: "Remove a task link from a wiki page.",
+      inputSchema: z.object({
+        pageId: nonEmptyString,
+        taskId: nonEmptyString,
+      }),
+    },
+    async (args) =>
+      run(() =>
+        client.json(
+          `/api/page/${encodeURIComponent(args.pageId)}/task/${encodeURIComponent(args.taskId)}`,
+          { method: "DELETE" },
+        ),
+      ),
+  );
 }
