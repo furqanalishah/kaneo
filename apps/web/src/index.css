@@ -1297,6 +1297,28 @@ input:-webkit-autofill:active {
     overflow-x: auto;
   }
 
+  /* Wiki pages carry reference tables far wider than a comment ever does.
+     The shared rules pin tables to the container with a fixed layout, which
+     squeezes columns to unreadable widths instead of letting the wrapper
+     scroll. Scoped to pages so comments and task descriptions keep their
+     existing behaviour. */
+  .kaneo-page-content table {
+    table-layout: auto;
+    width: max-content;
+    min-width: 100%;
+  }
+
+  .kaneo-page-content table td,
+  .kaneo-page-content table th {
+    white-space: normal;
+    min-width: 7rem;
+  }
+
+  .kaneo-page-content .tableWrapper {
+    overflow-x: auto;
+    max-width: 100%;
+  }
+
   .kaneo-comment-editor-prose .is-editor-empty:first-child::before {
     content: attr(data-placeholder);
     color: color-mix(in srgb, var(--foreground) 42%, transparent);

@@ -210,6 +210,7 @@ function RouteComponent() {
                 {/* biome-ignore lint/a11y/noStaticElementInteractions: capture-phase
                   marker for real input; the editor owns its own focus handling */}
                 <div
+                  className="kaneo-page-content"
                   onKeyDownCapture={() => {
                     touched.current = true;
                   }}
